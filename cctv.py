@@ -943,5 +943,6 @@ async def main():
                     file.write(f"{channel_name},{channel_url}\n")
                     channel_counters[channel_name] = 1
 
+
 if __name__ == "__main__":
     asyncio.run(main())
