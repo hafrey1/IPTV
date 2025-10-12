@@ -681,7 +681,7 @@ async def modify_urls(url):
 async def is_url_accessible(session, url, semaphore):
     async with semaphore:
         try:
-            async with session.get(url, timeout=0.5) as response:
+            async with session.get(url, timeout=1) as response:
                 if response.status == 200:
                     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     print(f"{current_time} {url}")
