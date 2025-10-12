@@ -44,7 +44,7 @@ jobs:
 
           while true; do
             echo "🛰️ 第 $((RETRY+1)) 次执行 new.py ..."
-            python ${{ github.workspace }}/new.py > run.log 2>&1 || true
+            python ${{ github.workspace }}/itvlist.py > run.log 2>&1 || true
 
             if [ ! -f speed_results.txt ]; then
               COUNT=0
