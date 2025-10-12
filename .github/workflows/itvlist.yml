@@ -34,6 +34,17 @@ jobs:
         run: |
           pip cache purge || true
           rm -rf __pycache__ *.pyc
+          
+      # 4. 打印系统信息，帮助排查差异
+      - name: Print system info
+        run: |
+          echo "===== System Info ====="
+          uname -a
+          lscpu
+          free -h
+          df -h
+          echo "===== Environment Variables ====="
+          env
 
       - name: Run itvlist.py until channel count >= 36
         run: |
