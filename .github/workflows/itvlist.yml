@@ -1,0 +1,79 @@
+name: itvlist
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 21 * * *'
+    - cron: '0 9 * * *'
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.3'
+
+      - name: Install dependencies
+        run: pip install selenium requests futures eventlet aiohttp aiofiles asyncio
+
+      - name: Force clean environment
+        run: |
+          pip cache purge || true
+          rm -rf __pycache__ *.pyc
+
+      - name: Run new.py until channel count >= 36
+        run: |
+          set -e
+          MAX_RETRY=10
+          RETRY=0
+          rm -f speed_results.txt itvlist.txt run.log
+
+          while true; do
+            echo "🛰️ 第 $((RETRY+1)) 次执行 new.py ..."
+            python ${{ github.workspace }}/new.py > run.log 2>&1 || true
+
+            if [ ! -f speed_results.txt ]; then
+              COUNT=0
+            else
+              COUNT=$(wc -l < speed_results.txt | tr -d ' ' || echo 0)
+            fi
+
+            echo "📺 当前可用频道数量: $COUNT"
+            if [ "$COUNT" -ge 36 ]; then
+              echo "✅ 可用频道数量达到要求（$COUNT ≥ 36），停止重试。"
+              break
+            fi
+
+            RETRY=$((RETRY+1))
+            if [ "$RETRY" -ge "$MAX_RETRY" ]; then
+              echo "❌ 已重试 $MAX_RETRY 次仍未达到要求，退出执行。"
+              cat run.log || true
+              exit 1
+            fi
+
+            echo "⚙️ 当前频道不足 36（$COUNT），3 秒后重新运行 new.py ..."
+            sleep 3
+          done
+
+      - name: 提交更改
+        run: |
+          git config --local user.email "hafrey@163.com"
+          git config --local user.name "hafrey"
+          git add .
+          git diff --cached --quiet || git commit -m "Add generated file (channels >= 36)"
+          git pull --rebase --autostash
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
