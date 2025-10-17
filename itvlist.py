@@ -326,7 +326,7 @@ async def main():
         for result in results:
             file.write(f"{result[0]},{result[1]},{result[2]}\n")
 
-    result_counter = 2  # 每个频道需要的个数
+    result_counter = 1  # 每个频道需要的个数
 
     with open("itvlist.txt", 'w', encoding='utf-8') as file:
         channel_counters = {}
