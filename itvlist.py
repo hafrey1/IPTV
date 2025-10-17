@@ -943,6 +943,7 @@ async def main():
                     file.write(f"{channel_name},{channel_url}\n")
                     channel_counters[channel_name] = 1
 
+
 def write_m3u8(results: List[Tuple[str, str, float]]) -> None:
     """
     保存数据为m3u8
@@ -997,5 +998,35 @@ def write_m3u8(results: List[Tuple[str, str, float]]) -> None:
                     file.write(f"{channel_url}\n")
                     channel_counters[channel_name] = 1
 
+
+async def main() -> None:
+    # 1. 探测 JSON 接口
+    result = await check_urls(urls)
+    print(result)
+    # 2. 拉取频道列表
+    sem = asyncio.Semaphore(MAX_CONCURRENCY)
+    async with aiohttp.ClientSession(timeout=TIMEOUT) as session:
+        fetch_tasks = [fetch_json(session, u, sem) for u in result]
+        lists = await asyncio.gather(*fetch_tasks)
+    channels = [item for sub in lists for item in sub]
+    # 3. 并发测速
+    measured = await measure_all_speeds(channels, sem)
+    measured.sort(key=lambda x: channel_key(x[0]))
+    for name, url, speed in measured:
+        print(f"{name}: {url} -> {speed:.2f} MB/s")
+    # 4. 保存文件
+    write_txt(measured)
+    write_m3u8(measured)
+
+
 if __name__ == "__main__":
+    # 并发量上限
+    MAX_CONCURRENCY = 300
+    # 请求超时
+    TIMEOUT = aiohttp.ClientTimeout(total=1)
+    # IPTV路径
+    IPTV_PATH = "/iptv/live/1000.json?key=txiptv"
+    # 每个频道保存个数
+     result_counter = 2
+    # 开始运行
     asyncio.run(main())
