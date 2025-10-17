@@ -681,7 +681,7 @@ async def modify_urls(url):
 async def is_url_accessible(session, url, semaphore):
     async with semaphore:
         try:
-            async with session.get(url, timeout=1) as response:
+            async with session.get(url, timeout=0.5) as response:
                 if response.status == 200:
                     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     print(f"{current_time} {url}")
@@ -821,7 +821,7 @@ async def main():
             channel_name, channel_url = task_queue.get()
             try:
                 channel_url_t = channel_url.rstrip(channel_url.split('/')[-1])  # m3u8链接前缀
-                lines = requests.get(channel_url, timeout=1.5).text.strip().split('\n')  # 获取m3u8文件内容
+                lines = requests.get(channel_url, timeout=1).text.strip().split('\n')  # 获取m3u8文件内容
                 ts_lists = [line.split('/')[-1] for line in lines if line.startswith('#') == False]  # 获取m3u8文件下视频流后缀
                 ts_lists_0 = ts_lists[0].rstrip(ts_lists[0].split('.ts')[-1])  # m3u8链接前缀
                 ts_url = channel_url_t + ts_lists[0]  # 拼接单个视频片段下载链接
@@ -943,75 +943,6 @@ async def main():
                     file.write(f"{channel_name},{channel_url}\n")
                     channel_counters[channel_name] = 1
 
-    with open("itvlist.m3u", 'w', encoding='utf-8') as file:
-        channel_counters = {}
-        file.write('#EXTM3U\n')
-        for result in results:
-            channel_name, channel_url, speed = result
-            if 'CCTV' in channel_name:
-                if channel_name in channel_counters:
-                    if channel_counters[channel_name] >= result_counter:
-                        continue
-                    else:
-                        file.write(f"#EXTINF:-1 group-title=\"央视频道\",{channel_name}\n")
-                        file.write(f"{channel_url}\n")
-                        channel_counters[channel_name] += 1
-                else:
-                    file.write(f"#EXTINF:-1 group-title=\"央视频道\",{channel_name}\n")
-                    file.write(f"{channel_url}\n")
-                    channel_counters[channel_name] = 1
-        channel_counters = {}
-        # file.write('卫视频道,#genre#\n')
-        for result in results:
-            channel_name, channel_url, speed = result
-            if '卫视' in channel_name:
-                if channel_name in channel_counters:
-                    if channel_counters[channel_name] >= result_counter:
-                        continue
-                    else:
-                        file.write(f"#EXTINF:-1 group-title=\"卫视频道\",{channel_name}\n")
-                        file.write(f"{channel_url}\n")
-                        channel_counters[channel_name] += 1
-                else:
-                    file.write(f"#EXTINF:-1 group-title=\"卫视频道\",{channel_name}\n")
-                    file.write(f"{channel_url}\n")
-                    channel_counters[channel_name] = 1
-        channel_counters = {}
-        # file.write('其他频道,#genre#\n')
-        for result in results:
-            channel_name, channel_url, speed = result
-            if 'CCTV' not in channel_name and '卫视' not in channel_name and '测试' not in channel_name:
-                if channel_name in channel_counters:
-                    if channel_counters[channel_name] >= result_counter:
-                        continue
-                    else:
-                        file.write(f"#EXTINF:-1 group-title=\"其他频道\",{channel_name}\n")
-                        file.write(f"{channel_url}\n")
-                        channel_counters[channel_name] += 1
-                else:
-                    file.write(f"#EXTINF:-1 group-title=\"其他频道\",{channel_name}\n")
-                    file.write(f"{channel_url}\n")
-                    channel_counters[channel_name] = 1
-
-
-async def main() -> None:
-    # 1. 探测 JSON 接口
-    result = await check_urls(urls)
-    print(result)
-    # 2. 拉取频道列表
-    sem = asyncio.Semaphore(MAX_CONCURRENCY)
-    async with aiohttp.ClientSession(timeout=TIMEOUT) as session:
-        fetch_tasks = [fetch_json(session, u, sem) for u in result]
-        lists = await asyncio.gather(*fetch_tasks)
-    channels = [item for sub in lists for item in sub]
-    # 3. 并发测速
-    measured = await measure_all_speeds(channels, sem)
-    measured.sort(key=lambda x: channel_key(x[0]))
-    for name, url, speed in measured:
-        print(f"{name}: {url} -> {speed:.2f} MB/s")
-    # 4. 保存文件
-    write_txt(measured)
-    write_m3u8(measured)
 
 if __name__ == "__main__":
     asyncio.run(main())
