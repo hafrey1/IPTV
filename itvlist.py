@@ -1018,15 +1018,5 @@ async def main() -> None:
     write_txt(measured)
     write_m3u8(measured)
 
-
 if __name__ == "__main__":
-    # 并发量上限
-    MAX_CONCURRENCY = 300
-    # 请求超时
-    TIMEOUT = aiohttp.ClientTimeout(total=1)
-    # IPTV路径
-    IPTV_PATH = "/iptv/live/1000.json?key=txiptv"
-    # 每个频道保存个数
-     result_counter = 2
-    # 开始运行
     asyncio.run(main())
