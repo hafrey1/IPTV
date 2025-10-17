@@ -49,7 +49,7 @@ jobs:
       - name: Run itvlist.py until channel count >= 36
         run: |
           set -e
-          MAX_RETRY=10
+          MAX_RETRY=3
           RETRY=0
           rm -f speed_results.txt itvlist.txt itvlist.log
 
