@@ -1,65 +1,79 @@
-import os
-import sys
-import platform
-import subprocess
-
-def check_environment():
-    print("=== 系统信息 ===")
-    print(f"操作系统: {platform.system()} {platform.release()}")
-    print(f"架构: {platform.machine()}")
-    print(f"Python版本: {platform.python_version()}")
-    print(f"当前用户: {os.getlogin()}")
-    print(f"环境变量 PATH: {os.environ.get('PATH')}")
-    print()
-
-def check_dependencies():
-    print("=== 依赖库版本 ===")
-    try:
-        import numpy
-        import scipy
-        import psutil
-        print(f"numpy版本: {numpy.__version__}")
-        print(f"scipy版本: {scipy.__version__}")
-        print(f"psutil版本: {psutil.__version__}")
-    except ImportError as e:
-        print(f"缺失库: {e}")
-    print()
-
-def check_hardware_access():
-    print("=== 硬件/资源访问检查 ===")
-    # 列出网络接口
-    try:
-        if platform.system() == "Windows":
-            output = subprocess.check_output("netsh interface show interface", shell=True, text=True)
-        else:
-            output = subprocess.check_output("ip link show", shell=True, text=True)
-        print("检测到网络接口:")
-        print(output)
-    except Exception as e:
-        print(f"无法获取网络接口: {e}")
-    
-    # 检查CPU/GPU数量
-    try:
-        import psutil
-        print(f"逻辑CPU核心数: {psutil.cpu_count(logical=True)}")
-        print(f"物理CPU核心数: {psutil.cpu_count(logical=False)}")
-    except Exception as e:
-        print(f"无法获取CPU信息: {e}")
-
-    # 检查用户权限
-    try:
-        print(f"是否管理员/root: {os.geteuid() == 0 if hasattr(os, 'geteuid') else '未知'}")
-    except Exception as e:
-        print(f"无法检查权限: {e}")
-
-def main():
-    check_environment()
-    check_dependencies()
-    check_hardware_access()
-    print("\n=== 可用频道检测建议 ===")
-    print("1. 如果网络接口为空或权限不足，工作流可能无法扫描频道。")
-    print("2. 检查工作流是否允许访问底层硬件/驱动。")
-    print("3. 确保工作流环境中依赖库和虚拟机一致。")
-
-if __name__ == "__main__":
-    main()
+#EXTM3U
+#EXTINF:-1 group-title="央视频道",CCTV1
+http://124.228.160.15:9901/tsfile/live/0017_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV4
+http://118.248.167.154:8088/tsfile/live/0004_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV5+
+http://124.228.160.15:9901/tsfile/live/0016_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV6
+http://222.134.245.16:9901/tsfile/live/0006_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV8
+http://118.248.167.154:8088/tsfile/live/0008_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV8
+http://112.234.23.204:9901/tsfile/live/0008_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV8
+http://222.134.245.16:9901/tsfile/live/0008_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV8
+http://124.228.160.15:9901/tsfile/live/0008_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV11
+http://222.134.245.16:9901/tsfile/live/0011_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV12
+http://124.228.160.15:9901/tsfile/live/0012_2.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV12
+http://118.248.167.154:8088/tsfile/live/0012_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV13
+http://118.248.167.154:8088/tsfile/live/0013_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV14
+http://222.134.245.16:9901/tsfile/live/0014_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV14
+http://118.248.167.154:8088/tsfile/live/0014_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV14
+http://124.228.160.15:9901/tsfile/live/0014_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV15
+http://112.234.23.204:9901/tsfile/live/0015_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="央视频道",CCTV15
+http://222.134.245.16:9901/tsfile/live/0015_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",东方卫视
+http://222.134.245.16:9901/tsfile/live/0107_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",东方卫视
+http://118.248.167.154:8088/tsfile/live/0121_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",北京卫视
+http://124.228.160.15:9901/tsfile/live/0122_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",天津卫视
+http://222.134.245.16:9901/tsfile/live/0135_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",宁夏卫视
+http://218.13.170.98:9901/tsfile/live/0112_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",宁夏卫视
+http://112.234.23.204:9901/tsfile/live/0112_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",广东卫视
+http://218.13.170.98:9901/tsfile/live/0017_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",广东卫视
+http://222.134.245.16:9901/tsfile/live/0125_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",广东卫视
+http://124.228.160.15:9901/tsfile/live/0125_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",广西卫视
+http://112.234.23.204:9901/tsfile/live/1011_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",江苏卫视
+http://118.248.167.154:8088/tsfile/live/0107_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",江苏卫视
+http://112.234.23.204:9901/tsfile/live/0127_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",深圳卫视
+http://118.248.167.154:8088/tsfile/live/0143_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",湖北卫视
+http://222.134.245.16:9901/tsfile/live/0132_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="卫视频道",贵州卫视
+http://222.134.245.16:9901/tsfile/live/0120_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="其他频道",临沂导视
+http://112.234.23.204:9901/tsfile/live/1038_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="其他频道",兰陵导视
+http://112.234.23.204:9901/tsfile/live/1024_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="其他频道",兰陵综合
+http://112.234.23.204:9901/tsfile/live/1022_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="其他频道",嘉佳卡通
+http://123.55.3.71:9901/tsfile/live/1009_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="其他频道",山东综艺
+http://112.234.23.204:9901/tsfile/live/1002_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="其他频道",湖南都市
+http://124.228.160.15:9901/tsfile/live/1044_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1 group-title="其他频道",风云音乐
+http://112.234.23.204:9901/tsfile/live/1030_1.m3u8?key=txiptv&playlive=1&authid=0
