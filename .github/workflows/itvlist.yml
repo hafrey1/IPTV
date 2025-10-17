@@ -6,7 +6,7 @@ on:
     - cron: '0 21 * * *'
     - cron: '0 9 * * *'
   push:
-    branches:
+    paths:
       - 'itvlist.py'
 
 permissions:
