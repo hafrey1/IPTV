@@ -12,41 +12,41 @@ eventlet.monkey_patch()
 
 
 urls = [
-"http://1.87.218.1:7878",
-"http://1.195.130.1:9901",
-"http://1.195.131.1:9901",
-"http://1.197.250.1:9901",
-"http://39.152.171.1:9901",
-"http://47.109.181.1:88",
-"http://47.116.70.1:9901",
-"http://49.232.48.1:9901",
+"http://1.87.218.1:4000",
+"http://1.195.130.1:4022",
+"http://1.195.131.1:4022",
+"http://1.197.250.1:4022",
+"http://39.152.171.1:8181",
+"http://47.109.181.1:4022",
+"http://47.116.70.1:4000",
+"http://49.232.48.1:4022",
 "http://58.19.133.1:9901",
 "http://58.57.40.1:9901",
-"http://59.38.45.1:8090",
-"http://60.255.47.1:8801",
+"http://59.38.45.1:9901",
+"http://60.255.47.1:9901",
 "http://61.136.172.1:9901",
-"http://61.156.228.1:8154",
+"http://61.156.228.1:9901",
 "http://101.66.194.1:9901",
 "http://101.66.195.1:9901",
 "http://101.66.198.1:9901",
 "http://101.66.199.1:9901",
 "http://101.74.28.1:9901",
-"http://103.39.222.1:9999",
-"http://106.42.34.1:888",
-"http://106.42.35.1:888",
+"http://103.39.222.1:9901",
+"http://106.42.34.1:9901",
+"http://106.42.35.1:9901",
 "http://106.118.70.1:9901",
-"http://110.253.83.1:888",
-"http://111.8.242.1:8085",
+"http://110.253.83.1:9901",
+"http://111.8.242.1:9901",
 "http://111.9.163.1:9901",
-"http://112.14.1:9901",
+"http://112.14.0.1:9901",
 "http://112.16.14.1:9901",
 "http://112.26.18.1:9901",
 "http://112.27.145.1:9901",
-"http://112.91.103.1:9919",
+"http://112.91.103.1:9901",
 "http://112.99.193.1:9901",
 "http://112.234.23.1:9901",
 "http://112.132.160.1:9901",
-"http://113.57.93.1:9900",
+"http://113.57.93.1:9901",
 "http://113.195.162.1:9901",
 "http://113.201.61.1:9901",
 "http://115.48.160.1:9901",
@@ -54,24 +54,24 @@ urls = [
 "http://116.128.242.1:9901",
 "http://117.174.99.1:9901",
 "http://119.125.131.1:9901",
-"http://121.19.134.1:808",
-"http://121.29.191.1:8000",
-"http://121.43.180.1:9901",
-"http://121.56.39.1:808",
+"http://121.19.134.1:9901",
+"http://121.29.191.1:9901",
+"http://121.43.180.1:4022",
+"http://121.56.39.1:4022",
 "http://122.227.100.1:9901",
-"http://123.13.247.1:7000",
+"http://123.13.247.1:9901",
 "http://123.54.220.1:9901",
 "http://123.129.70.1:9901",
-"http://123.130.84.1:8154",
+"http://123.130.84.1:9901",
 "http://123.139.57.1:9901",
-"http://123.182.60.1:9002",
-"http://124.152.247.1:2001",
+"http://123.182.60.1:9901",
+"http://124.152.247.1:9901",
 "http://125.42.148.1:9901",
-"http://125.42.228.1:9999",
+"http://125.42.228.1:9901",
 "http://125.43.244.1:9901",
 "http://125.125.236.1:9901",
-"http://159.75.75.1:8888",
-"http://171.9.68.1:8099",
+"http://159.75.75.1:4022",
+"http://171.9.68.1:4022",
 "http://180.213.174.1:9901",
 "http://182.114.48.1:9901",
 "http://182.114.49.1:9901",
@@ -79,16 +79,16 @@ urls = [
 "http://182.120.229.1:9901",
 "http://183.10.180.1:9901",
 "http://183.131.246.1:9901",
-"http://183.166.62.1:81",
+"http://183.166.62.1:9901",
 "http://183.255.41.1:9901",
-"http://211.142.224.1:2023",
+"http://211.142.224.1:9901",
 "http://218.13.170.1:9901",
 "http://218.77.81.1:9901",
 "http://218.87.237.1:9901",
 "http://220.248.173.1:9901",
-"http://221.2.148.1:8154",
+"http://221.2.148.1:9901",
 "http://221.13.235.1:9901",
-"http://222.172.183.1:808",
+"http://222.172.183.1:9901",
 "http://222.243.221.1:9901",
 "http://223.241.247.1:9901"
 ]
@@ -250,41 +250,65 @@ async def main():
             channel_name, channel_url = task_queue.get()
             try:
                 channel_url_t = channel_url.rstrip(channel_url.split('/')[-1])  # m3u8链接前缀
-                lines = requests.get(channel_url, timeout=1).text.strip().split('\n')  # 获取m3u8文件内容
+                lines = requests.get(channel_url, timeout=2).text.strip().split('\n')  # 获取m3u8文件内容
                 ts_lists = [line.split('/')[-1] for line in lines if line.startswith('#') == False]  # 获取m3u8文件下视频流后缀
+                
+                if not ts_lists:
+                    raise Exception("No TS files found")
+                
                 ts_lists_0 = ts_lists[0].rstrip(ts_lists[0].split('.ts')[-1])  # m3u8链接前缀
-                ts_url = channel_url_t + ts_lists[0]  # 拼接单个视频片段下载链接
 
-                # 多获取的视频数据进行5秒钟限制
-                with eventlet.Timeout(5, False):
+                # 优化：下载多个TS片段进行测速，提高准确性
+                ts_count = min(3, len(ts_lists))  # 下载最多3个片段
+                total_size = 0
+                
+                # 多获取的视频数据进行8秒钟限制（增加超时时间）
+                with eventlet.Timeout(8, False):
                     start_time = datetime.datetime.now().timestamp()
-                    content = requests.get(ts_url, timeout=1).content
+                    
+                    for i in range(ts_count):
+                        ts_url = channel_url_t + ts_lists[i]
+                        content = requests.get(ts_url, timeout=2).content
+                        total_size += len(content)
+                        
+                        # 写入第一个文件用于临时存储
+                        if i == 0:
+                            with open(ts_lists_0, 'ab') as f:
+                                f.write(content)
+                    
                     end_time = datetime.datetime.now().timestamp()
-                    response_time = (end_time - start_time) * 1
+                    response_time = end_time - start_time
 
-                if content:
-                    with open(ts_lists_0, 'ab') as f:
-                        f.write(content)  # 写入文件
-                    file_size = len(content)
-                    # print(f"文件大小：{file_size} 字节")
-                    download_speed = file_size / response_time / 1024
-                    # print(f"下载速度：{download_speed:.3f} kB/s")
-                    normalized_speed = min(max(download_speed / 1024, 0.001), 100)  # 将速率从kB/s转换为MB/s并限制在1~100之间
-                    # print(f"标准化后的速率：{normalized_speed:.3f} MB/s")
-
-                    # 删除下载的文件
-                    os.remove(ts_lists_0)
-                    result = channel_name, channel_url, f"{normalized_speed:.3f} MB/s"
-                    results.append(result)
-                    numberx = (len(results) + len(error_channels)) / len(all_results) * 100
-                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    print(f"{current_time}可用频道：{len(results)} 个 , 不可用频道：{len(error_channels)} 个 , 总频道：{len(all_results)} 个 ,总进度：{numberx:.2f} %。")
-            except:
+                    if total_size > 0 and response_time > 0:
+                        download_speed = total_size / response_time / 1024  # kB/s
+                        # 移除下限限制，直接显示真实速度，只限制上限
+                        normalized_speed = min(download_speed / 1024, 100)  # 转换为 MB/s，上限100
+                        
+                        # 删除下载的文件
+                        if os.path.exists(ts_lists_0):
+                            os.remove(ts_lists_0)
+                        
+                        result = channel_name, channel_url, f"{normalized_speed:.4f} MB/s"  # 增加小数位数到4位
+                        results.append(result)
+                        numberx = (len(results) + len(error_channels)) / len(all_results) * 100
+                        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        print(f"{current_time} 可用频道：{len(results)} 个 , 不可用频道：{len(error_channels)} 个 , 总频道：{len(all_results)} 个 , 总进度：{numberx:.2f}% - {channel_name}: {normalized_speed:.4f} MB/s")
+                    else:
+                        raise Exception("Invalid size or time")
+                        
+            except Exception as e:
+                # 清理可能存在的临时文件
+                try:
+                    if 'ts_lists_0' in locals() and os.path.exists(ts_lists_0):
+                        os.remove(ts_lists_0)
+                except:
+                    pass
+                    
                 error_channel = channel_name, channel_url
                 error_channels.append(error_channel)
                 numberx = (len(results) + len(error_channels)) / len(all_results) * 100
                 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print(f"{current_time}可用频道：{len(results)} 个 , 不可用频道：{len(error_channels)} 个 , 总频道：{len(all_results)} 个 ,总进度：{numberx:.2f} %。")
+                print(f"{current_time} 可用频道：{len(results)} 个 , 不可用频道：{len(error_channels)} 个 , 总频道：{len(all_results)} 个 , 总进度：{numberx:.2f}%")
 
             # 标记任务完成
             task_queue.task_done()
@@ -300,9 +324,7 @@ async def main():
 
     # 创建工作线程
     num_workers = 10
-    #pool = eventlet.GreenPool(num_workers)
     for _ in range(num_workers):
-        #pool.spawn(worker)
         t = threading.Thread(target=worker, daemon=True)  # 将工作线程设置为守护线程
         t.start()
 
@@ -317,7 +339,6 @@ async def main():
     task_queue.join()
 
     # 对结果进行排序
-    #results.sort(key=lambda x: channel_key(x[0]))
     results.sort(key=lambda x: (x[0], -float(x[2].split()[0])))
     results.sort(key=lambda x: channel_key(x[0]))
 
@@ -390,7 +411,6 @@ async def main():
                     file.write(f"{channel_url}\n")
                     channel_counters[channel_name] = 1
         channel_counters = {}
-        #file.write('卫视频道,#genre#\n')
         for result in results:
             channel_name, channel_url, speed = result
             if '卫视' in channel_name:
@@ -406,7 +426,6 @@ async def main():
                     file.write(f"{channel_url}\n")
                     channel_counters[channel_name] = 1
         channel_counters = {}
-        #file.write('其他频道,#genre#\n')
         for result in results:
             channel_name, channel_url, speed = result
             if 'CCTV' not in channel_name and '卫视' not in channel_name and '测试' not in channel_name:
